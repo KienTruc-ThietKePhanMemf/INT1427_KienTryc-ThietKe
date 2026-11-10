@@ -1,98 +1,63 @@
 from decimal import Decimal
-from sqlalchemy.orm import Session
-from sqlalchemy import extract, func
+from sqlalchemy import func
+from sqlalchemy.orm import Session, joinedload
 
-from app.models.category import Category
-from app.models.transaction import Transaction
-from app.models.wallet import Wallet
+from app.models.product import Product
+from app.models.stock_movement import StockMovement
+from app.schemas.product import ProductResponse
+from app.schemas.report import LowStockReport, OverviewReport
+from app.schemas.stock_movement import StockMovementResponse
 
 
-def get_dashboard_overview(db: Session, user_id: int, month: int, year: int) -> dict:
-    # 1. Tính tổng thu nhập tháng
-    total_income = (
-        db.query(func.coalesce(func.sum(Transaction.amount), 0))
+def get_low_stock_products(db: Session, user_id: int) -> LowStockReport:
+    items = (
+        db.query(Product)
+        .options(joinedload(Product.category))
         .filter(
-            Transaction.user_id == user_id,
-            Transaction.transaction_type == "INCOME",
-            extract("month", Transaction.transaction_date) == month,
-            extract("year", Transaction.transaction_date) == year,
+            Product.user_id == user_id,
+            Product.stock_quantity <= Product.min_threshold,
         )
-        .scalar()
+        .order_by(Product.stock_quantity.asc(), Product.id.asc())
+        .all()
+    )
+    return LowStockReport(
+        total=len(items),
+        items=[ProductResponse.model_validate(item) for item in items],
     )
 
-    # 2. Tính tổng chi tiêu tháng
-    total_expense = (
-        db.query(func.coalesce(func.sum(Transaction.amount), 0))
-        .filter(
-            Transaction.user_id == user_id,
-            Transaction.transaction_type == "EXPENSE",
-            extract("month", Transaction.transaction_date) == month,
-            extract("year", Transaction.transaction_date) == year,
-        )
+
+def get_dashboard_overview(db: Session, user_id: int) -> OverviewReport:
+    total_products = (
+        db.query(func.count(Product.id)).filter(Product.user_id == user_id).scalar() or 0
+    )
+    total_stock_quantity = (
+        db.query(func.coalesce(func.sum(Product.stock_quantity), 0))
+        .filter(Product.user_id == user_id)
         .scalar()
     )
-
-    # 3. Tính tổng số dư hiện tại của tất cả các ví
-    total_balance = (
-        db.query(func.coalesce(func.sum(Wallet.balance), 0))
-        .filter(Wallet.user_id == user_id)
-        .scalar()
-    )
-
-    # 4. Tìm danh mục chi tiêu nhiều nhất trong tháng
-    top_category_query = (
+    total_inventory_value = (
         db.query(
-            Category.category_name,
-            func.sum(Transaction.amount).label("total_amount"),
+            func.coalesce(func.sum(Product.stock_quantity * Product.buy_price), 0)
         )
-        .join(Transaction, Transaction.category_id == Category.id)
-        .filter(
-            Transaction.user_id == user_id,
-            Transaction.transaction_type == "EXPENSE",
-            extract("month", Transaction.transaction_date) == month,
-            extract("year", Transaction.transaction_date) == year,
-        )
-        .group_by(Category.id, Category.category_name)
-        .order_by(func.sum(Transaction.amount).desc())
-        .first()
+        .filter(Product.user_id == user_id)
+        .scalar()
     )
 
-    top_category = None
-    if top_category_query:
-        top_category = {
-            "category_name": top_category_query[0],
-            "total_amount": top_category_query[1],
-        }
-
-    # 5. Thống kê chi tiêu theo từng danh mục (Phục vụ vẽ biểu đồ Tròn/Cột)
-    category_breakdown = (
-        db.query(
-            Category.category_name,
-            func.sum(Transaction.amount).label("total_amount"),
+    recent = (
+        db.query(StockMovement)
+        .options(
+            joinedload(StockMovement.product).joinedload(Product.category),
+            joinedload(StockMovement.supplier),
         )
-        .join(Transaction, Transaction.category_id == Category.id)
-        .filter(
-            Transaction.user_id == user_id,
-            Transaction.transaction_type == "EXPENSE",
-            extract("month", Transaction.transaction_date) == month,
-            extract("year", Transaction.transaction_date) == year,
-        )
-        .group_by(Category.id, Category.category_name)
+        .filter(StockMovement.user_id == user_id)
+        .order_by(StockMovement.created_at.desc(), StockMovement.id.desc())
+        .limit(10)
         .all()
     )
 
-    breakdown_list = [
-        {"category_name": item[0], "total_amount": item[1]}
-        for item in category_breakdown
-    ]
-
-    return {
-        "month": month,
-        "year": year,
-        "total_income": Decimal(str(total_income)),
-        "total_expense": Decimal(str(total_expense)),
-        "net_savings": Decimal(str(total_income)) - Decimal(str(total_expense)),
-        "total_balance": Decimal(str(total_balance)),
-        "top_expense_category": top_category,
-        "category_breakdown": breakdown_list,
-    }
+    return OverviewReport(
+        total_products=int(total_products),
+        total_stock_quantity=int(total_stock_quantity or 0),
+        total_inventory_value=Decimal(str(total_inventory_value or 0)),
+        recent_movements=[StockMovementResponse.model_validate(m) for m in recent],
+    )

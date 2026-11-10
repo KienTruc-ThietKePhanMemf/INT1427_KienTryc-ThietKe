@@ -5,7 +5,7 @@ load_dotenv()
 
 
 class Settings:
-    PROJECT_NAME: str = os.getenv("PROJECT_NAME", "Student Expense Manager")
+    PROJECT_NAME: str = os.getenv("PROJECT_NAME", "Mini Inventory Management System")
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
         "mysql+pymysql://root:password@localhost:3306/student_expense_db",

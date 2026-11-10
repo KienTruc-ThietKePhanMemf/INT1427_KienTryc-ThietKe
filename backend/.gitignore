@@ -1,0 +1,22 @@
+# Python / Virtual Environment
+backend/venv/
+backend/__pycache__/
+*.py[cod]
+*$py.class
+*.env
+
+# IDE / Editor Settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Database & Logs
+*.sqlite3
+*.log
+
+# Frontend (Cho giai đoạn sau)
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+.DS_Store

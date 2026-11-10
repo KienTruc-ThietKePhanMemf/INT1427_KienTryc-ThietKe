@@ -1,0 +1,33 @@
+# AGENT SKILLS & FRONTEND CODING RULES (Student Expense Manager)
+
+## 1. UI/UX Pro Max Standard
+- **Spacing:** Sử dụng hệ thống spacing 4px/8px (`p-2`, `p-4`, `p-6`, `gap-4`...). Tuyệt đối không dùng px lẻ như `padding: 13px`.
+- **Contrast & Colors:** Màu chữ và nền đạt chuẩn WCAG. Dùng tông màu hiện đại, chuyên nghiệp (Slate/Zinc/Emerald cho các chỉ số tài chính, Red cho Khoản chi EXPENSE, Green cho Khoản thu INCOME).
+- **Responsive:** Layout responsive mượt mà từ Mobile (`sm`), Tablet (`md`) đến Desktop (`lg`/`xl`) bằng Flexbox và Grid.
+
+## 2. Emil Design System Style
+- **Giao diện:** Phong cách Clean, Minimalist, Glassmorphism nhẹ (`backdrop-blur`, `border border-slate-200` hoặc `border-white/10`).
+- **Components:** Buttons, Cards, Inputs đồng bộ `rounded-xl` hoặc `rounded-lg`, hover effect mượt mà (`transition-all duration-200`).
+- **Typography:** Hierarchy chữ rõ ràng (Heading bold, body regular, subtext muted/gray).
+
+## 3. Image-to-Code & Component Rules
+- Code bằng **React (Vite) + TypeScript + Tailwind CSS + Lucide Icons**.
+- Chia nhỏ Component sạch sẽ: `components/common/`, `components/dashboard/`, `components/wallets/`, `components/transactions/`.
+
+## 4. Animation Motion
+- Hiệu ứng chuyển động mượt mà (dùng Framer Motion hoặc Tailwind Transitions).
+- Đảm bảo micro-interactions cho nút bấm (`active:scale-95`), skeleton loading state, và modal transitions.
+
+## 5. Architecture & API Integration Rules (CRITICAL FOR BACKEND INTEGRATION)
+- **Base URL:** API Backend chạy tại `http://127.0.0.1:8000/api/v1`.
+- **Axios Interceptors Setup:**
+  - Tự động lấy `access_token` từ `localStorage` đính kèm vào Header `Authorization: Bearer <token>`.
+  - Bắt lỗi Response: Nếu Backend trả về status `401 Unauthorized`, tự động xóa token và redirect người dùng về trang `/login`.
+  - Hiển thị thông báo lỗi từ Backend (`error.response.data.message`) ra giao diện (Toast/Alert).
+- **Required Pages & Routes:**
+  1. `/login` & `/register`: Đăng nhập/Đăng ký tài khoản.
+  2. `/dashboard`: Tổng quan thu chi tháng, biểu đồ, ví tiền, hạn mức ngân sách.
+  3. `/wallets`: Quản lý danh sách Ví (Tiền mặt, Ngân hàng, MoMo), biến động số dư.
+  4. `/transactions`: Danh sách lịch sử Thu/Chi, bộ lọc theo Ví/Danh mục, Form thêm/sửa/xóa giao dịch.
+  5. `/budgets`: Thiết lập hạn mức chi tiêu hàng tháng, tiến độ % cảnh báo (dưới 80% màu xanh, 80-99% màu vàng, 100% màu đỏ).
+- **Data Types Standard:** Tạo các `interface` TypeScript chuẩn xác khớp với FastAPI Schema (`User`, `Wallet`, `Category`, `Transaction`, `Budget`, `ReportOverview`).

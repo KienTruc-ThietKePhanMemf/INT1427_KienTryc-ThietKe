@@ -8,9 +8,19 @@ class OverviewReport(BaseModel):
     total_products: int
     total_stock_quantity: int
     total_inventory_value: Decimal
-    recent_movements: list[StockMovementResponse]
+    low_stock_count: int = 0
+    recent_movements: list[StockMovementResponse] = []
 
 
 class LowStockReport(BaseModel):
     total: int
     items: list[ProductResponse]
+
+
+class TopProductItem(BaseModel):
+    product_id: int
+    product_name: str
+    sku: str
+    total_imported: int
+    total_exported: int
+    total_movement: int

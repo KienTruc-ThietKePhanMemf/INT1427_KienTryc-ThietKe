@@ -28,6 +28,11 @@ class ProductUpdate(BaseModel):
     min_threshold: int | None = Field(None, ge=0)
 
 
+class ProductAdjust(BaseModel):
+    real_quantity: int = Field(..., ge=0)
+    reason: str | None = Field(None, max_length=255)
+
+
 class ProductResponse(ProductBase):
     id: int
     user_id: int

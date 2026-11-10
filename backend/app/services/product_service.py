@@ -101,3 +101,16 @@ def delete_product(db: Session, product_id: int, user_id: int) -> None:
         raise NotFoundException("Không tìm thấy sản phẩm.")
     db.delete(db_product)
     db.commit()
+
+
+def adjust_product_stock(
+    db: Session, product_id: int, real_quantity: int, reason: str | None, user_id: int
+) -> Product:
+    db_product = get_product_by_id(db, product_id=product_id, user_id=user_id)
+    if not db_product:
+        raise NotFoundException("Không tìm thấy sản phẩm.")
+    db_product.stock_quantity = real_quantity
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+

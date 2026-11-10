@@ -6,7 +6,7 @@ from app.core.database import get_db
 from app.core.exceptions import NotFoundException
 from app.core.security import get_current_user
 from app.models.user import User
-from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
+from app.schemas.product import ProductAdjust, ProductCreate, ProductResponse, ProductUpdate
 from app.services import product_service
 
 router = APIRouter()
@@ -67,6 +67,23 @@ def update_product(
         db=db,
         product_id=product_id,
         product_in=product_in,
+        user_id=current_user.id,
+    )
+
+
+@router.put("/{product_id}/adjust", response_model=ProductResponse)
+def adjust_product_stock(
+    product_id: int,
+    adjust_in: ProductAdjust,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """Kiểm kê / Điều chỉnh tồn kho thực tế"""
+    return product_service.adjust_product_stock(
+        db=db,
+        product_id=product_id,
+        real_quantity=adjust_in.real_quantity,
+        reason=adjust_in.reason,
         user_id=current_user.id,
     )
 

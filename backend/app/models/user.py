@@ -1,14 +1,14 @@
 import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 from sqlalchemy import BigInteger, DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
 if TYPE_CHECKING:
-    from app.models.budget import Budget
     from app.models.category import Category
-    from app.models.transaction import Transaction
-    from app.models.wallet import Wallet
+    from app.models.product import Product
+    from app.models.stock_movement import StockMovement
+    from app.models.supplier import Supplier
 
 
 class User(Base):
@@ -31,16 +31,15 @@ class User(Base):
         onupdate=datetime.datetime.utcnow,
     )
 
-    # Relationships (Sử dụng built-in list)
-    wallets: Mapped[list["Wallet"]] = relationship(
-        "Wallet", back_populates="owner", cascade="all, delete-orphan"
-    )
     categories: Mapped[list["Category"]] = relationship(
         "Category", back_populates="owner", cascade="all, delete-orphan"
     )
-    transactions: Mapped[list["Transaction"]] = relationship(
-        "Transaction", back_populates="owner", cascade="all, delete-orphan"
+    suppliers: Mapped[list["Supplier"]] = relationship(
+        "Supplier", back_populates="owner", cascade="all, delete-orphan"
     )
-    budgets: Mapped[list["Budget"]] = relationship(
-        "Budget", back_populates="owner", cascade="all, delete-orphan"
+    products: Mapped[list["Product"]] = relationship(
+        "Product", back_populates="owner", cascade="all, delete-orphan"
+    )
+    stock_movements: Mapped[list["StockMovement"]] = relationship(
+        "StockMovement", back_populates="owner", cascade="all, delete-orphan"
     )

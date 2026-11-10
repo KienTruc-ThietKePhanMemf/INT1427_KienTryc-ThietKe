@@ -1,7 +1,7 @@
 import datetime
 from typing import Annotated
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pwdlib import PasswordHash
 from pwdlib.hashers.bcrypt import BcryptHasher
@@ -9,12 +9,13 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.exceptions import UnauthorizedException
 from app.models.user import User
 
 # Khởi tạo password hasher hiện đại với Bcrypt
 password_hash_context = PasswordHash((BcryptHasher(),))
 
-security_scheme = HTTPBearer()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
 
 # 1. Mã hóa mật khẩu
@@ -46,18 +47,12 @@ def create_access_token(
     return encoded_jwt
 
 
-# 4. Dependency: Xác thực Token HTTPBearer & Lấy User hiện tại
+# 4. Dependency: Xác thực JWT OAuth2 Bearer & Lấy User hiện tại
 def get_current_user(
-    auth: Annotated[HTTPAuthorizationCredentials, Depends(security_scheme)],
+    token: Annotated[str, Depends(oauth2_scheme)],
     db: Annotated[Session, Depends(get_db)],
 ) -> User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Không thể xác thực thông tin đăng nhập",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-    token = auth.credentials
+    credentials_exception = UnauthorizedException("Không thể xác thực thông tin đăng nhập")
 
     try:
         payload = jwt.decode(

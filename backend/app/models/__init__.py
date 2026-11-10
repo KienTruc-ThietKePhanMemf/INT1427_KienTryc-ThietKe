@@ -1,7 +1,7 @@
 from app.models.user import User
-from app.models.wallet import Wallet
 from app.models.category import Category
-from app.models.transaction import Transaction
-from app.models.budget import Budget
+from app.models.supplier import Supplier
+from app.models.product import Product
+from app.models.stock_movement import StockMovement
 
-__all__ = ["User", "Wallet", "Category", "Transaction", "Budget"]
+__all__ = ["User", "Category", "Supplier", "Product", "StockMovement"]

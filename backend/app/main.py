@@ -1,25 +1,42 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.core.config import settings
-from app.core.database import Base, engine
+from app.core.database import Base, SessionLocal, engine
 from app.core.exceptions import AppException
 from app.core.handlers import (
     app_exception_handler,
     global_exception_handler,
     validation_exception_handler,
 )
+from app.services.category_service import seed_default_categories
 
 import app.models  # Load models
-# Tự động tạo bảng trong MySQL nếu chưa có
-Base.metadata.create_all(bind=engine)
+
+
+def init_db() -> None:
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        seed_default_categories(db)
+    finally:
+        db.close()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version="1.0.0",
-    description="Backend API cho hệ thống quản lý chi tiêu sinh viên",
+    description="Backend API cho Hệ thống Quản lý Kho Mini (Mini Inventory Management System)",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -30,12 +47,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === ĐĂNG KÝ GLOBAL EXCEPTION HANDLERS ===
 app.add_exception_handler(AppException, app_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, global_exception_handler)
 
-# Gắn toàn bộ router v1 vào endpoint có tiền tố /api/v1
 app.include_router(api_router, prefix="/api/v1")
 
 

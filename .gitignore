@@ -1,0 +1,7 @@
+backend/app.db
+backend/*.db
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.env

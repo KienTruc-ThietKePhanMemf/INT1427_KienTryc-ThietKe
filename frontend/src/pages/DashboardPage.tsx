@@ -7,7 +7,6 @@ import {
   DollarSign,
   Loader2,
   Package,
-  Plus,
   ShieldAlert,
   ShieldCheck,
 } from 'lucide-react';

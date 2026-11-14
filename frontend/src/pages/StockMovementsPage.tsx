@@ -12,7 +12,6 @@ import {
   Filter,
   Loader2,
   Package,
-  Plus,
   Truck,
   X,
 } from 'lucide-react';
@@ -99,7 +98,7 @@ export const StockMovementsPage: React.FC = () => {
       const params = {
         movement_type:
           filterType === 'IMPORT' || filterType === 'EXPORT'
-            ? filterType
+            ? (filterType as 'IMPORT' | 'EXPORT')
             : undefined,
         product_id: filterProductId ? Number(filterProductId) : undefined,
         page: currentPage,

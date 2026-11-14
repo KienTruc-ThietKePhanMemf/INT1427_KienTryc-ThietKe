@@ -13,7 +13,6 @@ import {
   Lock,
   Mail,
   PackageSearch,
-  ShieldCheck,
   Sparkles,
   Warehouse,
 } from 'lucide-react';

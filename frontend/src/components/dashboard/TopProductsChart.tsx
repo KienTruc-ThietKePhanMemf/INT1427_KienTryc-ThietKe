@@ -3,7 +3,6 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   BarChart3,
-  Package,
 } from 'lucide-react';
 import type { TopProductItem } from '../../types/inventory';
 

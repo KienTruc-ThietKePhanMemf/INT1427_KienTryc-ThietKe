@@ -8,7 +8,7 @@ class Settings:
     PROJECT_NAME: str = os.getenv("PROJECT_NAME", "Mini Inventory Management System")
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "mysql+pymysql://root:password@localhost:3306/student_expense_db",
+        "sqlite:///D:/INT1427_KienTryc-ThietKe/backend/app.db",
     )
     SECRET_KEY: str = os.getenv("SECRET_KEY", "loc_super_secret_key_jwt_2026")
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")

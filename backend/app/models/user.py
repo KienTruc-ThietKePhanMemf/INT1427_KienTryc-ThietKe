@@ -1,6 +1,6 @@
 import datetime
 from typing import TYPE_CHECKING
-from sqlalchemy import BigInteger, DateTime, String
+from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
@@ -15,7 +15,7 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(
-        BigInteger, primary_key=True, index=True, autoincrement=True
+        Integer, primary_key=True, index=True, autoincrement=True
     )
     full_name: Mapped[str] = mapped_column(String(100), nullable=False)
     email: Mapped[str] = mapped_column(

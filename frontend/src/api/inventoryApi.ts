@@ -534,6 +534,7 @@ export const inventoryApi = {
         total_products,
         total_stock_quantity,
         total_inventory_value,
+        low_stock_count: demoProducts.filter((p) => p.stock_quantity <= p.min_threshold).length,
         recent_movements: demoMovements.slice(0, 5),
       };
     }
@@ -555,6 +556,7 @@ export const inventoryApi = {
           total_products,
           total_stock_quantity,
           total_inventory_value,
+          low_stock_count: demoProducts.filter((p) => p.stock_quantity <= p.min_threshold).length,
           recent_movements: demoMovements.slice(0, 5),
         };
       }

@@ -1,7 +1,7 @@
 import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, Numeric, String
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
@@ -15,13 +15,13 @@ class Product(Base):
     __tablename__ = "products"
 
     id: Mapped[int] = mapped_column(
-        BigInteger, primary_key=True, index=True, autoincrement=True
+        Integer, primary_key=True, index=True, autoincrement=True
     )
     user_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     category_id: Mapped[int] = mapped_column(
-        BigInteger,
+        Integer,
         ForeignKey("categories.id", ondelete="RESTRICT"),
         nullable=False,
         index=True,

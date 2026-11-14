@@ -1,6 +1,6 @@
 import datetime
 from typing import TYPE_CHECKING, Optional
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
@@ -14,19 +14,19 @@ class StockMovement(Base):
     __tablename__ = "stock_movements"
 
     id: Mapped[int] = mapped_column(
-        BigInteger, primary_key=True, index=True, autoincrement=True
+        Integer, primary_key=True, index=True, autoincrement=True
     )
     user_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     product_id: Mapped[int] = mapped_column(
-        BigInteger,
+        Integer,
         ForeignKey("products.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     supplier_id: Mapped[Optional[int]] = mapped_column(
-        BigInteger,
+        Integer,
         ForeignKey("suppliers.id", ondelete="SET NULL"),
         nullable=True,
         index=True,

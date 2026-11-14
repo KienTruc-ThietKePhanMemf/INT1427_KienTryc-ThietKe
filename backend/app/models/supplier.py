@@ -1,6 +1,6 @@
 import datetime
 from typing import TYPE_CHECKING, Optional
-from sqlalchemy import BigInteger, DateTime, ForeignKey, String
+from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
@@ -13,10 +13,10 @@ class Supplier(Base):
     __tablename__ = "suppliers"
 
     id: Mapped[int] = mapped_column(
-        BigInteger, primary_key=True, index=True, autoincrement=True
+        Integer, primary_key=True, index=True, autoincrement=True
     )
     user_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     supplier_name: Mapped[str] = mapped_column(String(150), nullable=False)
     phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
